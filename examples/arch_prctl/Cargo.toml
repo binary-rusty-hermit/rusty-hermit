@@ -1,23 +1,19 @@
-[workspace]
-members = [
-    "hermit-abi",
-    "hermit-sys",
-    "benches/netbench",
-    "benches/micro",
-    "examples/hello_world",
-    "examples/httpd",
-    "examples/demo",
-    "examples/hello_world_asm",
-    "examples/file",
-    "examples/arch_prctl",
-]
-exclude = ["target", "loader", "libhermit-rs"]
+[package]
+name = "arch_prctl"
+version = "0.1.0"
+authors = ["Laurent Pool <laurent.pool@student.manchester.ac.uk>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[target.'cfg(all(any(target_arch = "x86_64", target_arch = "aarch64"), target_os = "hermit"))'.dependencies]
+hermit-sys = { path = "../../hermit-sys", default-features = false, features = ["with_submodule"] }
 
 [profile.release]
 opt-level = 3
 debug = false
 rpath = false
-lto = "thin"
+lto = false
 debug-assertions = false
 
 [profile.dev]
@@ -27,3 +23,6 @@ debug = true       # controls whether the compiler passes `-C debuginfo`
 rpath = false      # controls whether the compiler passes `-C rpath`
 lto = false         # controls `-C lto` for binaries and staticlibs
 debug-assertions = true # controls whether debug assertions are enabled
+
+
+
