@@ -8,7 +8,7 @@ extern crate hermit_sys;
 
 fn main() {
 	// TODO Get entry point address
-	println!("Hello World!");
+	println!("Binary loader");
 /*
 	unsafe {
 		asm!("jmp {}", );

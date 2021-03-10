@@ -4,6 +4,7 @@ members = [
     "hermit-sys",
     "benches/netbench",
     "benches/micro",
+    "examples/binary_loader",
     "examples/hello_world",
     "examples/httpd",
     "examples/demo",
