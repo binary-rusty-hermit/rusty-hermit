@@ -46,6 +46,7 @@ const APP_EHDR_PHNUM: u16 = 6;
 const APP_EHDR_PHENTSIZE: u16 = 56;
 
 // Push ELF auxiliary vectors to the stack
+#[inline(always)]
 fn push_auxv(at_type: u64, at_value: u64) {
 	unsafe {
 		asm!(
@@ -98,7 +99,7 @@ fn main() {
 	push_auxv(AT_PLATFORM, auxv_platform_ptr as u64);
 
 
-	loop {}
+	//loop {}
 
 	unsafe {
 		asm!(
