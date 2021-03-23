@@ -62,7 +62,20 @@ fn main() {
 	let auxv_platform = CString::new("x86_64").expect("CString::new failed");
 	let auxv_platform_ptr = auxv_platform.as_ptr();
 
+	// Get the number of command line args and env vars
+	let argc: usize = env::args().count() - 1;
+        let envc: usize = env::vars().count();
+        println!("argc: {}\nenvc: {}", argc, envc);
+
+	let env_vars: Vec<String> = env::vars().map(|(key, val)| format!("{}={}", key, val)).collect();
+
+	for i in 0..envc {
+		println!("envv[{}]: {}", i, env_vars[i]);
+	}
+	//println!("{:?}", env_vars);
+
 	println!("Binary loader");
+	println!("{}", envc);
 /*
         for (env_var_key, env_var_value) in env::vars() {
             println!("env_vars: {}, {:?}", env_var_key, env_var_value);
@@ -99,7 +112,14 @@ fn main() {
 	push_auxv(AT_PLATFORM, auxv_platform_ptr as u64);
 
 
-	//loop {}
+	for i in (0..envc).rev() {
+		unsafe {
+			asm!(
+			    "push {0}",
+			    in(reg) &env_vars[i]
+			);
+		}
+	}
 
 	unsafe {
 		asm!(
