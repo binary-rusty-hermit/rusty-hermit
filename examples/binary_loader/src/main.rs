@@ -65,17 +65,45 @@ fn main() {
 	// Get the number of command line args and env vars
 	let argc: usize = env::args().count() - 1;
         let envc: usize = env::vars().count();
+
         println!("argc: {}\nenvc: {}", argc, envc);
 
-	let env_vars: Vec<String> = env::vars().map(|(key, val)| format!("{}={}", key, val)).collect();
+	// Create vector of CString pointers to env vars.
+
+	//let env_vars: Vec<String> = env::vars().map(|(key, val)| format!("{}={}", key, val)).collect();
+	//let env_vars: Vec<_> = env::vars().map(|env| CString::new(env.as_str()).unwrap()).collect();
+	let env_vars: Vec<_> = env::vars()
+				.map(|(key, val)| CString::new(format!("{}={}", key, val)).unwrap())
+				.collect();
+
+        let mut env_vars_ptr: Vec<_> = env_vars.iter()
+				.map(|env| env.as_ptr())
+				.collect();
+
+	env_vars_ptr.push(std::ptr::null());
+
+
+	// Create vector of CString pointers to argv elements.
+	let argv: Vec<_> = env::args()
+				.map(|arg| CString::new(arg.as_str()).unwrap())
+				.collect();
+
+        let mut argv_ptr: Vec<_> = argv.iter()
+				.map(|arg| arg.as_ptr())
+				.collect();
+
+	argv_ptr.push(std::ptr::null());
 
 	for i in 0..envc {
-		println!("envv[{}]: {}", i, env_vars[i]);
+		println!("envv[{}]: {:?}", i, env_vars[i]);
 	}
-	//println!("{:?}", env_vars);
+	println!("env_vars_ptr: {:?}", env_vars_ptr);
+	for env_vp in env_vars_ptr.iter().rev() {
+		println!("env_vp: {:?}", env_vp);
+	}
 
 	println!("Binary loader");
-	println!("{}", envc);
+	//println!("{}", envc);
 /*
         for (env_var_key, env_var_value) in env::vars() {
             println!("env_vars: {}, {:?}", env_var_key, env_var_value);
@@ -112,15 +140,40 @@ fn main() {
 	push_auxv(AT_PLATFORM, auxv_platform_ptr as u64);
 
 
-	for i in (0..envc).rev() {
+	// Push env var pointers to the stack in reverse order. Starting with null.
+	for env_p in env_vars_ptr.iter().rev() {
 		unsafe {
 			asm!(
 			    "push {0}",
-			    in(reg) &env_vars[i]
+			    in(reg) *env_p
 			);
 		}
 	}
 
+/*
+	for i in (0..envc).rev() {
+		unsafe {
+			asm!(
+			    "push {0}",
+			    in(reg) env_vars_ptr[i]
+			);
+		}
+	}
+*/
+	loop {}
+
+	// Push argv pointers to the stack in reverse order. Starting with null.
+	for argv_p in argv_ptr.iter().rev() {
+		unsafe {
+			asm!(
+			    "push {0}",
+			    in(reg) *argv_p as u64
+			);
+		}
+	}
+
+
+	// Clear value in rdx and jump to entry point.
 	unsafe {
 		asm!(
 		    "xor rdx, rdx",
