@@ -4,3 +4,4 @@
 [submodule "libhermit-rs"]
 	path = libhermit-rs
 	url = https://github.com/binary-rusty-hermit/libhermit-rs.git
+	branch = SystemCallHandling
