@@ -38,11 +38,14 @@ const AT_SYSINFO: u64		= 32;
 
 // TODO Get values from boot info
 // Hardcoded values.
-const APP_SIZE: u64 = 0x6bca00;
+//const APP_SIZE: u64 = 0x6bca00; // GCC-compiled Hello World
+const APP_SIZE: u64 = 0x4000b0; // ASM Hello World (syscall_asm)
 const APP_START: usize = 0x0;
-const APP_ENTRY_POINT: u64 = 0x400a50;
+//const APP_ENTRY_POINT: u64 = 0x400a50; // GCC-compiled Hello World
+const APP_ENTRY_POINT: u64 = 0x400078; // ASM Hello World (syscall_asm)
 const APP_EHDR_PHOFF: u64 = 64;
-const APP_EHDR_PHNUM: u16 = 6;
+//const APP_EHDR_PHNUM: u16 = 6; // GCC-compiled Hello World
+const APP_EHDR_PHNUM: u16 = 1; // ASM Hello World (syscall_asm)
 const APP_EHDR_PHENTSIZE: u16 = 56;
 
 // Push ELF auxiliary vectors to the stack
@@ -59,6 +62,8 @@ fn push_auxv(at_type: u64, at_value: u64) {
 }
 
 fn main() {
+	println!("Binary loader");
+
 	let auxv_platform = CString::new("x86_64").expect("CString::new failed");
 	let auxv_platform_ptr = auxv_platform.as_ptr();
 
@@ -66,7 +71,7 @@ fn main() {
 	let argc: usize = env::args().count() - 1;
         let envc: usize = env::vars().count();
 
-        println!("argc: {}\nenvc: {}", argc, envc);
+	println!("argc: {}\nenvc: {}", argc, envc);
 
 	// Create vector of CString pointers to env vars.
 
@@ -94,15 +99,18 @@ fn main() {
 
 	argv_ptr.push(std::ptr::null());
 
+
+	// Debugging
 	for i in 0..envc {
 		println!("envv[{}]: {:?}", i, env_vars[i]);
 	}
+
 	println!("env_vars_ptr: {:?}", env_vars_ptr);
+
 	for env_vp in env_vars_ptr.iter().rev() {
 		println!("env_vp: {:?}", env_vp);
 	}
 
-	println!("Binary loader");
 	//println!("{}", envc);
 /*
         for (env_var_key, env_var_value) in env::vars() {
@@ -139,16 +147,17 @@ fn main() {
 	push_auxv(AT_NOTELF, 0x0);
 	push_auxv(AT_PLATFORM, auxv_platform_ptr as u64);
 
-
+/*
 	// Push env var pointers to the stack in reverse order. Starting with null.
 	for env_p in env_vars_ptr.iter().rev() {
 		unsafe {
 			asm!(
 			    "push {0}",
-			    in(reg) *env_p
+			    in(reg) *env_p as u64
 			);
 		}
 	}
+*/
 
 /*
 	for i in (0..envc).rev() {
@@ -160,8 +169,9 @@ fn main() {
 		}
 	}
 */
-	loop {}
+	//loop {}
 
+/*
 	// Push argv pointers to the stack in reverse order. Starting with null.
 	for argv_p in argv_ptr.iter().rev() {
 		unsafe {
@@ -171,17 +181,15 @@ fn main() {
 			);
 		}
 	}
+*/
 
 
 	// Clear value in rdx and jump to entry point.
 	unsafe {
 		asm!(
 		    "xor rdx, rdx",
-                    "mov rax, [{0}]",
-                    "jmp rax",
+                    "jmp {0}",
 		    in(reg) APP_ENTRY_POINT,
-		    out("rdx") _,
-                    out("rax") _
 		);
 	}
 

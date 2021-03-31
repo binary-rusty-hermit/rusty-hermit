@@ -19,6 +19,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "arch_prctl"
+version = "0.1.0"
+dependencies = [
+ "hermit-sys",
+]
+
+[[package]]
 name = "ascii"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -220,6 +227,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cd56b59865bce947ac5958779cfa508f6c3b9497cc762b7e24a12d11ccde2c4f"
 
 [[package]]
+name = "file"
+version = "0.1.0"
+dependencies = [
+ "hermit-sys",
+]
+
+[[package]]
 name = "fuchsia-cprng"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -233,6 +247,13 @@ checksum = "51b22edfb537aaffec56e77d3116a1dd0a0fa8bb5a8bd7d6d4a522132c9bb383"
 
 [[package]]
 name = "hello_world"
+version = "0.1.0"
+dependencies = [
+ "hermit-sys",
+]
+
+[[package]]
+name = "hello_world_asm"
 version = "0.1.0"
 dependencies = [
  "hermit-sys",
