@@ -106,7 +106,7 @@ fn main() {
 	}
 
 	println!("env_vars_ptr: {:?}", env_vars_ptr);
-
+	println!("argv_ptr: {:?}", argv_ptr);
 	for env_vp in env_vars_ptr.iter().rev() {
 		println!("env_vp: {:?}", env_vp);
 	}
@@ -183,7 +183,16 @@ fn main() {
 	}
 */
 
+	// Push argc
+	unsafe {
+		asm!(
+		    "push {0}",
+		    in(reg) argc as u64
+		);
+	}
 
+
+	loop {}
 	// Clear value in rdx and jump to entry point.
 	unsafe {
 		asm!(
