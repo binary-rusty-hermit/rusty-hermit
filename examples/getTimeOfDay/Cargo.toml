@@ -1,5 +1,5 @@
 [package]
-name = "file"
+name = "getTimeOfDay"
 version = "0.1.0"
 authors = ["u92314lp <laurent.pool@student.manchester.ac.uk>"]
 edition = "2018"
@@ -23,10 +23,6 @@ debug = true       # controls whether the compiler passes `-C debuginfo`
 rpath = false      # controls whether the compiler passes `-C rpath`
 lto = false         # controls `-C lto` for binaries and staticlibs
 debug-assertions = true # controls whether debug assertions are enabled
-
-
-
-
 
 
 
