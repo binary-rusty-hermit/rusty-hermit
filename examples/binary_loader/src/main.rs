@@ -98,6 +98,7 @@ fn main() {
 		println!("envv[{}]: {:?}", i, env_vars[i]);
 	}
 	println!("env_vars_ptr: {:?}", env_vars_ptr);
+	println!("argv_ptr: {:?}", argv_ptr);
 	for env_vp in env_vars_ptr.iter().rev() {
 		println!("env_vp: {:?}", env_vp);
 	}
@@ -145,7 +146,7 @@ fn main() {
 		unsafe {
 			asm!(
 			    "push {0}",
-			    in(reg) *env_p
+			    in(reg) *env_p as u64
 			);
 		}
 	}
@@ -160,7 +161,7 @@ fn main() {
 		}
 	}
 */
-	loop {}
+	//loop {}
 
 	// Push argv pointers to the stack in reverse order. Starting with null.
 	for argv_p in argv_ptr.iter().rev() {
@@ -172,16 +173,23 @@ fn main() {
 		}
 	}
 
+	// Push argc
+	unsafe {
+		asm!(
+		    "push {0}",
+		    in(reg) argc as u64
+		);
+	}
 
+
+	loop {}
 	// Clear value in rdx and jump to entry point.
 	unsafe {
 		asm!(
 		    "xor rdx, rdx",
                     "mov rax, [{0}]",
                     "jmp rax",
-		    in(reg) APP_ENTRY_POINT,
-		    out("rdx") _,
-                    out("rax") _
+		    in(reg) APP_ENTRY_POINT
 		);
 	}
 
